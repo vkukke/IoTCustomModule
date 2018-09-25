@@ -59,6 +59,11 @@ if (-not $BuildSourceVersion) {
     $BuildSourceVersion = DefaultBuildSourceVersion
 }
 
+Write-Host "AgentWorkFolder $AgentWorkFolder."
+Write-Host "BuildRepositoryLocalPath '$BuildRepositoryLocalPath'."
+Write-Host "BuildBinariesDirectory '$BuildBinariesDirectory'."
+Write-Host "Configuration '$Configuration'."
+
 $SLN_PATTERN = "CustomModule.*.sln"
 $CSPROJ_PATTERN = "*.csproj"
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
