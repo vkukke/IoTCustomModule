@@ -40,6 +40,11 @@ if (-not $BuildBinariesDirectory) {
     $BuildBinariesDirectory = DefaultBuildOutputPath
 }
 
+Write-Host "AgentWorkFolder $AgentWorkFolder."
+Write-Host "BuildRepositoryLocalPath '$BuildRepositoryLocalPath'."
+Write-Host "BuildBinariesDirectory '$BuildBinariesDirectory'."
+Write-Host "Filter '$Filter'."
+
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
 $LOGGER_ARG = "trx;LogFileName=result.trx"
 
