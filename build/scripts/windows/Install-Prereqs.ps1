@@ -20,7 +20,8 @@ param (
     [String]$BuildRepositoryLocalPath = $Env:BUILD_REPOSITORY_LOCALPATH,
 
     [Switch]$Dotnet,
-    [Switch]$Nuget
+    [Switch]$Nuget,
+    [Switch]$Coverage
 )
 
 Set-StrictMode -Version "Latest"
@@ -40,7 +41,7 @@ if (-not $BuildRepositoryLocalPath) {
     $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
 }
 
-$All = -not $Dotnet -and -not $Nuget
+$All = -not $Dotnet -and -not $Nuget -and -not $Coverage
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -72,8 +73,8 @@ if ($Dotnet -or $All) {
  #>
 
 if ($Nuget -or $All) {
-    $NugetInstallPath = Join-Path $AgentWorkFolder "nuget"
-    $NugetExe = Join-Path $NugetInstallPath "nuget.exe"
+   $NugetInstallPath = Join-Path $AgentWorkFolder "nuget"
+   $NugetExe = Join-Path $NugetInstallPath "nuget.exe"
     if (Test-Path $NugetInstallPath) {
         Remove-Item $NugetInstalLPath -Force -Recurse
     }
@@ -82,4 +83,25 @@ if ($Nuget -or $All) {
     Write-Host "Downloading Nuget."
     (New-Object System.Net.WebClient).DownloadFile($NugetUrl, $NugetExe)
 }
+
+<#
+ # Install code coverage tools
+ #>
+
+if ($Coverage -or $All) {
+    $NugetConfig = Join-Path $BuildRepositoryLocalPath "nuget.config"
+	
+	$CodeCoverageToolsInstallPath = Join-Path $AgentWorkFolder "cctools"
+    if (Test-Path $CodeCoverageToolsInstallPath) {
+        Remove-Item $CodeCoverageToolsInstallPath -Force -Recurse
+    }
+    New-Item $CodeCoverageToolsInstallPath -ItemType "Directory" -Force
+
+	#[IO.Path]::Combine($BuildRepositoryLocalPath, "build", "tools")
+	Write-Host "Installing coverage tools"
+    &$NugetExe install OpenCover -version 4.6.519 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
+    &$NugetExe install OpenCoverToCoberturaConverter -version 0.2.6 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
+    &$NugetExe install ReportGenerator  -version 2.5.6 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
+}
+
 Write-Host "Done!"
