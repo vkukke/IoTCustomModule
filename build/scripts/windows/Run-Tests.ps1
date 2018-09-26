@@ -61,7 +61,7 @@ if (-not (Test-Path $DOTNET_PATH -PathType Leaf)) {
  #>
 
 $BaseTestCommand = if ($Filter) {
-    "test --no-build --logger `"$LOGGER_ARG`" --filter `"$Filter`" --collect `"Code Coverage`"" 
+    "test --no-build --logger `"$LOGGER_ARG`" --filter `"$Filter`" --collect `"Code coverage`"" 
 }
 else {
     "test --no-build --logger `"$LOGGER_ARG`" --collect `"Code Coverage`""
