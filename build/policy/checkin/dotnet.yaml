@@ -1,58 +1,50 @@
 phases:
 
-################################################################################
-  - phase: linux_amd64
-################################################################################
-    displayName: Linux amd64
-    queue:
-      name: Hosted Linux Preview
-    steps:
-      - task: Bash@3
-        displayName: Install
-        inputs:
-          filePath: build/scripts/linux/installPrereqs.sh
-          arguments: -u $(NetCorePackageUriLinux)
-      - task: Bash@3
-        displayName: Build
-        inputs:
-          filePath: build/scripts/linux/buildBranch.sh
-      - task: Bash@3
-        displayName: Test
-        inputs:
-          filePath: build/scripts/linux/runTests.sh
-          arguments: "\"--filter Category=Unit\""
-      - task: PublishTestResults@2
-        displayName: Publish Test Results
-        inputs:
-          testRunner: VSTest
-          testResultsFiles: '**/TestResults/result.trx'
-        condition: succeededOrFailed()
+- phase: Phase_1
+  displayName: Windows Build
+  condition: succeeded()
+  queue:
+    name: Hosted VS2017
 
-################################################################################
-  - phase: windows_amd64
-################################################################################
-    displayName: Windows amd64
-    queue:
-      name: Hosted VS2017
-    steps:
-      - task: PowerShell@2
-        displayName: Install
-        inputs:
-          filePath: build/scripts/windows/setup/Install-Prereqs.ps1
-          arguments: -DotnetSdkUrl $(NetCorePackageUriWindows) -Dotnet -Nuget
-      - task: PowerShell@2
-        displayName: Build
-        inputs:
-          filePath: build/scripts/windows/build/Build-Branch.ps1
-          arguments: -PublishTests:$True -UpdateVersion
-      - task: PowerShell@2
-        displayName: Test
-        inputs:
-          filePath: build/scripts/windows/test/Run-Tests.ps1
-          arguments: -Filter Category=Unit
-      - task: PublishTestResults@2
-        displayName: Publish Test Results
-        inputs:
-          testRunner: VSTest
-          testResultsFiles: '**/TestResults/result.trx'
-        condition: succeededOrFailed()
+  steps:
+  - powershell: ./ 'build/scripts/windows/Install-Prereqs.ps1' 
+    arguments: '-Dotnet -Nuget -Cover'
+    failOnStderr: true
+    displayName: 'Install Pre-requisties'
+
+  - powershell: ./ 'build/scripts/windows/Build-Branch.ps1' 
+    failOnStderr: true
+    displayName: 'Build Sources'
+
+  - powershell: ./ 'build/scripts/windows/Run-Tests.ps1' 
+    failOnStderr: true
+    displayName: 'Run Tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/result.trx'
+      mergeTestResults: true
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Code Coverage Results'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(Build.BinariesDirectory)/CoberturaCoverage.xml'
+      reportDirectory: '$(Build.BinariesDirectory)/report'
+      failIfCoverageEmpty: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    inputs:
+      PathtoPublish: '$(Build.BinariesDirectory)'
+
+
+- phase: Phase_2
+  displayName: Linux Build
+
+  condition: succeeded()
+  queue:
+    name: Hosted Ubuntu 1604
+
