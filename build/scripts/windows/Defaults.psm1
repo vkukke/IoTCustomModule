@@ -7,11 +7,7 @@ function DefaultBuildRepositoryLocalPath {
 }
 
 function DefaultBuildBinariesDirectory($BuildRepositoryLocalPath = (DefaultBuildRepositoryLocalPath)) {
-    Join-Path $BuildRepositoryLocalPath "target"
-}
-
-function DefaultCodeCoverageToolsLocalPath($BuildRepositoryLocalPath = (DefaultAgentWorkFolder)) {
-        [IO.Path]::Combine($BuildRepositoryLocalPath, "cctools")
+    Join-Path $BuildRepositoryLocalPath "bin"
 }
 
 function DefaultConfiguration {

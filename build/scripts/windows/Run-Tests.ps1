@@ -49,8 +49,8 @@ Write-Host "Filter '$Filter'."
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
 $LOGGER_ARG = "trx;LogFileName=result.trx"
 
-$CCTOOLS_PATH = DefaultCodeCoverageToolsLocalPath
 $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
+$CCTOOLS_PATH = Join-Path $AgentWorkFolder "cctools"
 $OPENCOVER = [IO.Path]::Combine($CCTOOLS_PATH, "OpenCover.4.6.519", "tools", "OpenCover.Console.exe")
 $CODE_COVERAGE = Join-Path $BuildBinariesDirectory "code-coverage.xml"
 $OPENCOVER_COBERTURA_CONVERTER = [IO.Path]::Combine(
@@ -85,6 +85,7 @@ $Success = $True
 foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSPROJ_PATTERN -Recurse)) {
     Write-Host "Running tests for $Project."
     if (Test-Path $OPENCOVER -PathType "Leaf") {
+	    Write-Host "Running tests from if."
         &$OPENCOVER `
             -register:user `
             -target:$DOTNET_PATH `
@@ -97,6 +98,7 @@ foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSP
             -returntargetcode
     }
     else {
+	    Write-Host "Running tests from else."
         Invoke-Expression "&`"$DOTNET_PATH`" $BaseTestCommand -o $BuildBinariesDirectory $Project"
     }
 

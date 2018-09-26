@@ -23,7 +23,8 @@ param (
     [ValidateNotNull()]
     [String] $BuildSourceVersion = $Env:BUILD_SOURCEVERSION,
     
-    [Switch] $UpdateVersion
+    [Switch] $UpdateVersion,
+    [Switch] $PublishTests
 )
 
 Set-StrictMode -Version "Latest"
@@ -59,26 +60,17 @@ if (-not $BuildSourceVersion) {
     $BuildSourceVersion = DefaultBuildSourceVersion
 }
 
-Write-Host "AgentWorkFolder $AgentWorkFolder."
-Write-Host "BuildRepositoryLocalPath '$BuildRepositoryLocalPath'."
-Write-Host "BuildBinariesDirectory '$BuildBinariesDirectory'."
-Write-Host "Configuration '$Configuration'."
-
-$SLN_PATTERN = "CustomModule.*.sln"
+$SLN_PATTERN = "CustomModule*.sln"
 $CSPROJ_PATTERN = "*.csproj"
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
 
 $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
 $VERSIONINFO_FILE_PATH = Join-Path $BuildRepositoryLocalPath "versionInfo.json"
 $SRC_SCRIPTS_DIR = [IO.Path]::Combine($BuildRepositoryLocalPath, "build", "scripts")
-$SRC_BIN_DIR = Join-Path $BuildRepositoryLocalPath "bin"
 
-$PUBLISH_FOLDER = Join-Path $BuildBinariesDirectory "publish"
-$PUB_SCRIPTS_DIR = Join-Path $PUBLISH_FOLDER "scripts"
-$PUB_BIN_DIR = Join-Path $PUBLISH_FOLDER "bin"
-
-$RELEASE_TESTS_FOLDER = Join-Path $BuildBinariesDirectory "release-tests"
-$TEST_SCRIPTS_DIR = Join-Path $RELEASE_TESTS_FOLDER "scripts"
+$BIN_FOLDER = Join-Path $BuildBinariesDirectory "bin"
+$PUBLISH_ROOT_FOLDER = Join-Path $BuildBinariesDirectory "publish"
+$PUBLISH_SCRIPTS_DIR = Join-Path $PUBLISH_ROOT_FOLDER "scripts"
 
 if (-not (Test-Path $DOTNET_PATH -PathType Leaf)) {
     throw "$DOTNET_PATH not found"
@@ -116,7 +108,7 @@ Write-Host "`nBuilding all solutions in repo`n"
 
 foreach ($Solution in (Get-ChildItem $BuildRepositoryLocalPath -Include $SLN_PATTERN -Recurse)) {
     Write-Host "Building Solution - $Solution"
-    &$DOTNET_PATH build -c $Configuration -o $BuildBinariesDirectory $Solution |
+    &$DOTNET_PATH build -c $Configuration -o $BIN_FOLDER $Solution |
         Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Failed building $Solution."
@@ -136,43 +128,32 @@ $AppProjects = Get-ChildItem $BuildRepositoryLocalPath -Include $CSPROJ_PATTERN 
 
 foreach ($Project in $AppProjects) {
     Write-Host "Publishing Solution - $($Project.Filename)"
-    $ProjectPublishPath = Join-Path $PUBLISH_FOLDER ($Project.Filename -replace @(".csproj", ""))
+    $ProjectPublishPath = Join-Path $PUBLISH_ROOT_FOLDER ($Project.Filename -replace @(".csproj", ""))
     &$DOTNET_PATH publish -f netcoreapp2.1 -c $Configuration -o $ProjectPublishPath $Project.Path |
         Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Failed publishing $($Project.Filename)."
     }
 }
+
 <#
  # Publish tests
  #>
 Write-Host "`nPublishing .NET Core Tests`n"
 foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSPROJ_PATTERN -Recurse)) {
         Write-Host "Publishing - $Project"
-        $ProjectPublishPath = Join-Path $RELEASE_TESTS_FOLDER "target"
-        &$DOTNET_PATH publish -f netcoreapp2.1 -c $Configuration -o $ProjectPublishPath $Project |
+        $ProjectPublishPath = Join-Path $PUBLISH_ROOT_FOLDER ($Project.BaseName -replace @(".csproj", ""))
+		&$DOTNET_PATH publish -f netcoreapp2.1 -c $Configuration -o $ProjectPublishPath $Project |
             Write-Host
         if ($LASTEXITCODE -ne 0) {
             throw "Failed publishing $Project."
         }
+}
 
-        $ProjectCopyPath = Join-Path $RELEASE_TESTS_FOLDER $Project.BaseName
-        Write-Host "Copying $Project to $ProjectCopyPath"
-        Copy-Item $Project $ProjectCopyPath -Force
-    }
 
-    Write-Host "Copying $SRC_SCRIPTS_DIR to $TEST_SCRIPTS_DIR"
-    Copy-Item $SRC_SCRIPTS_DIR $TEST_SCRIPTS_DIR -Force -Recurse
-    Copy-Item (Join-Path $BuildRepositoryLocalPath "Nuget.config") $RELEASE_TESTS_FOLDER
-
-	
 <#
  # Copy remaining files
  #>
 
-Write-Host "Copying $SRC_SCRIPTS_DIR to $PUB_SCRIPTS_DIR"
-Copy-Item $SRC_SCRIPTS_DIR $PUB_SCRIPTS_DIR -Recurse -Force 
-
-#Write-Host "Copying $SRC_BIN_DIR to $PUB_BIN_DIR"
-#Copy-Item $SRC_BIN_DIR $PUB_BIN_DIR -Recurse -Force 
-
+Write-Host "Copying $SRC_SCRIPTS_DIR to $PUBLISH_SCRIPTS_DIR"
+Copy-Item $SRC_SCRIPTS_DIR $PUBLISH_SCRIPTS_DIR -Recurse -Force 
