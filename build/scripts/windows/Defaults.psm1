@@ -2,16 +2,16 @@ function DefaultAgentWorkFolder {
     $env:ProgramFiles
 }
 
-function DefaultBuildRepositoryPath {
+function DefaultBuildRepositoryLocalPath {
     [IO.Path]::Combine($PSScriptRoot, "..", "..", "..")
 }
 
-function DefaultBuildScriptsRepositoryPath {
-    [IO.Path]::Combine($PSScriptRoot, "..")
+function DefaultBuildBinariesDirectory($BuildRepositoryLocalPath = (DefaultBuildRepositoryLocalPath)) {
+    Join-Path $BuildRepositoryLocalPath "target"
 }
 
-function DefaultNugetConfigLocalPath {
-    [IO.Path]::Combine($PSScriptRoot, "..", "..", "..")
+function DefaultCodeCoverageToolsLocalPath($BuildRepositoryLocalPath = (DefaultAgentWorkFolder)) {
+        [IO.Path]::Combine($BuildRepositoryLocalPath, "cctools")
 }
 
 function DefaultConfiguration {
@@ -24,16 +24,4 @@ function DefaultBuildId {
 
 function DefaultBuildSourceVersion {
     ""
-}
-
-function DefaultBuildOutputPath {
-    [IO.Path]::Combine($PSScriptRoot, "..", "..", "..", "out")
-}
-
-function DefaultBuildOutputCCToolsDirectory($BuildRepositoryLocalPath = (DefaultBuildOutputPath)) {
-    Join-Path $BuildRepositoryLocalPath "cctools"
-}
-
-function DefaultBuildOutputBinariesDirectory($BuildRepositoryLocalPath = (DefaultBuildOutputPath)) {
-    Join-Path $BuildRepositoryLocalPath "target"
 }

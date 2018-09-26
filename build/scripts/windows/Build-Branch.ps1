@@ -40,11 +40,11 @@ if (-not $AgentWorkFolder) {
 }
 
 if (-not $BuildRepositoryLocalPath) {
-    $BuildRepositoryLocalPath = DefaultBuildRepositoryPath
+    $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
 }
  
 if (-not $BuildBinariesDirectory) {
-    $BuildBinariesDirectory = DefaultBuildOutputBinariesDirectory
+    $BuildBinariesDirectory = DefaultBuildBinariesDirectory
 }
 
 if (-not $Configuration) {
@@ -64,15 +64,15 @@ $CSPROJ_PATTERN = "*.csproj"
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
 
 $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
-$PUBLISH_FOLDER = Join-Path $BuildBinariesDirectory "publish"
-$RELEASE_TESTS_FOLDER = Join-Path $BuildBinariesDirectory "release-tests"
 $VERSIONINFO_FILE_PATH = Join-Path $BuildRepositoryLocalPath "versionInfo.json"
-
 $SRC_SCRIPTS_DIR = [IO.Path]::Combine($BuildRepositoryLocalPath, "build", "scripts")
 $SRC_BIN_DIR = Join-Path $BuildRepositoryLocalPath "bin"
 
+$PUBLISH_FOLDER = Join-Path $BuildBinariesDirectory "publish"
 $PUB_SCRIPTS_DIR = Join-Path $PUBLISH_FOLDER "scripts"
-#$PUB_BIN_DIR = Join-Path $PUBLISH_FOLDER "bin"
+$PUB_BIN_DIR = Join-Path $PUBLISH_FOLDER "bin"
+
+$RELEASE_TESTS_FOLDER = Join-Path $BuildBinariesDirectory "release-tests"
 $TEST_SCRIPTS_DIR = Join-Path $RELEASE_TESTS_FOLDER "scripts"
 
 if (-not (Test-Path $DOTNET_PATH -PathType Leaf)) {
@@ -139,20 +139,10 @@ foreach ($Project in $AppProjects) {
     }
 }
 <#
- # Copy remaining files
- #>
-
-Write-Host "Copying $SRC_SCRIPTS_DIR to $PUB_SCRIPTS_DIR"
-Copy-Item $SRC_SCRIPTS_DIR $PUB_SCRIPTS_DIR -Recurse -Force 
-
-#Write-Host "Copying $SRC_BIN_DIR to $PUB_BIN_DIR"
-#Copy-Item $SRC_BIN_DIR $PUB_BIN_DIR -Recurse -Force 
-
-<#
  # Publish tests
  #>
 Write-Host "`nPublishing .NET Core Tests`n"
-    foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSPROJ_PATTERN -Recurse)) {
+foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSPROJ_PATTERN -Recurse)) {
         Write-Host "Publishing - $Project"
         $ProjectPublishPath = Join-Path $RELEASE_TESTS_FOLDER "target"
         &$DOTNET_PATH publish -f netcoreapp2.1 -c $Configuration -o $ProjectPublishPath $Project |
@@ -169,3 +159,15 @@ Write-Host "`nPublishing .NET Core Tests`n"
     Write-Host "Copying $SRC_SCRIPTS_DIR to $TEST_SCRIPTS_DIR"
     Copy-Item $SRC_SCRIPTS_DIR $TEST_SCRIPTS_DIR -Force -Recurse
     Copy-Item (Join-Path $BuildRepositoryLocalPath "Nuget.config") $RELEASE_TESTS_FOLDER
+
+	
+<#
+ # Copy remaining files
+ #>
+
+Write-Host "Copying $SRC_SCRIPTS_DIR to $PUB_SCRIPTS_DIR"
+Copy-Item $SRC_SCRIPTS_DIR $PUB_SCRIPTS_DIR -Recurse -Force 
+
+#Write-Host "Copying $SRC_BIN_DIR to $PUB_BIN_DIR"
+#Copy-Item $SRC_BIN_DIR $PUB_BIN_DIR -Recurse -Force 
+

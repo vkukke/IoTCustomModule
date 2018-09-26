@@ -33,17 +33,23 @@ if (-not $AgentWorkFolder) {
 }
 
 if (-not $BuildRepositoryLocalPath) {
-    $BuildRepositoryLocalPath = DefaultBuildRepositoryPath
+    $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
 }
 
 if (-not $BuildBinariesDirectory) {
-    $BuildBinariesDirectory = DefaultBuildOutputPath
+    $BuildBinariesDirectory = DefaultBuildBinariesDirectory
 }
+
+Write-Host "AgentWorkFolder $AgentWorkFolder."
+Write-Host "BuildRepositoryLocalPath '$BuildRepositoryLocalPath'."
+Write-Host "BuildBinariesDirectory '$BuildBinariesDirectory'."
+Write-Host "Filter '$Filter'."
+
 
 $TEST_CSPROJ_PATTERN = "*Tests.csproj"
 $LOGGER_ARG = "trx;LogFileName=result.trx"
 
-$CCTOOLS_PATH = DefaultBuildOutputCCToolsDirectory
+$CCTOOLS_PATH = DefaultCodeCoverageToolsLocalPath
 $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
 $OPENCOVER = [IO.Path]::Combine($CCTOOLS_PATH, "OpenCover.4.6.519", "tools", "OpenCover.Console.exe")
 $CODE_COVERAGE = Join-Path $BuildBinariesDirectory "code-coverage.xml"

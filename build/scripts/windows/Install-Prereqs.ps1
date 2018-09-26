@@ -38,7 +38,7 @@ if (-not $AgentWorkFolder) {
 }
 
 if (-not $BuildRepositoryLocalPath) {
-    $BuildRepositoryLocalPath = DefaultBuildRepositoryPath
+    $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
 }
 
 $All = -not $Dotnet -and -not $Nuget -and -not $Coverage
@@ -89,13 +89,19 @@ if ($Nuget -or $All) {
  #>
 
 if ($Coverage -or $All) {
-    $NugetConfigLocalPath = DefaultNugetConfigLocalPath
-    $NugetConfig = Join-Path $NugetConfigLocalPath "nuget.config"
-	$CodeCoverageToolsPath =  DefaultBuildOutputCCToolsDirectory
+    $NugetConfig = Join-Path $BuildRepositoryLocalPath "nuget.config"
+	
+	$CodeCoverageToolsInstallPath = Join-Path $AgentWorkFolder "cctools"
+    if (Test-Path $CodeCoverageToolsInstallPath) {
+        Remove-Item $CodeCoverageToolsInstallPath -Force -Recurse
+    }
+    New-Item $CodeCoverageToolsInstallPath -ItemType "Directory" -Force
+
+	#[IO.Path]::Combine($BuildRepositoryLocalPath, "build", "tools")
 	Write-Host "Installing coverage tools"
-    &$NugetExe install OpenCover -version 4.6.519 -OutputDirectory $CodeCoverageToolsPath -ConfigFile $NugetConfig
-    &$NugetExe install OpenCoverToCoberturaConverter -version 0.2.6 -OutputDirectory $CodeCoverageToolsPath -ConfigFile $NugetConfig
-    &$NugetExe install ReportGenerator  -version 2.5.6 -OutputDirectory $CodeCoverageToolsPath -ConfigFile $NugetConfig
+    &$NugetExe install OpenCover -version 4.6.519 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
+    &$NugetExe install OpenCoverToCoberturaConverter -version 0.2.6 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
+    &$NugetExe install ReportGenerator  -version 2.5.6 -OutputDirectory $CodeCoverageToolsInstallPath -ConfigFile $NugetConfig
 }
 
 Write-Host "Done!"
