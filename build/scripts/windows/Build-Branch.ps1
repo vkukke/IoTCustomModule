@@ -23,8 +23,7 @@ param (
     [ValidateNotNull()]
     [String] $BuildSourceVersion = $Env:BUILD_SOURCEVERSION,
     
-    [Switch] $UpdateVersion,
-    [Switch] $PublishTests
+    [Switch] $UpdateVersion
 )
 
 Set-StrictMode -Version "Latest"
