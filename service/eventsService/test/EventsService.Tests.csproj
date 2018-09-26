@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\common\Common.csproj" />
-    <ProjectReference Include="..\..\src\service\eventsService\EventsService.csproj" />
+    <ProjectReference Include="..\..\..\common\src\Common.csproj" />
+    <ProjectReference Include="..\src\EventsService.csproj" />
   </ItemGroup>
 
 </Project>

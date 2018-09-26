@@ -3,17 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomModule", "src\module\customModule\CustomModule.csproj", "{9DE61B26-6FE2-456F-82B9-55DCC6D2CCFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomModule", "module\customModule\src\CustomModule.csproj", "{9DE61B26-6FE2-456F-82B9-55DCC6D2CCFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsService", "src\service\eventsService\EventsService.csproj", "{D40E3563-19F2-4FCC-9D2F-E689C14D74C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsService", "service\eventsService\src\EventsService.csproj", "{D40E3563-19F2-4FCC-9D2F-E689C14D74C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\common\Common.csproj", "{2BBB4332-1151-47DD-9DB7-711B660C7F09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "common\src\Common.csproj", "{2BBB4332-1151-47DD-9DB7-711B660C7F09}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{563F9405-6013-4868-9BE4-9EEEB0F08DFD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FFE63A84-C897-45C6-964D-7F133EE83B3F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsService.Tests", "test\EventsService.Tests\EventsService.Tests.csproj", "{A3DDB169-C52E-43BD-A6A3-A2454B5B9F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsService.Tests", "service\eventsService\test\EventsService.Tests.csproj", "{A3DDB169-C52E-43BD-A6A3-A2454B5B9F42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,12 +36,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{9DE61B26-6FE2-456F-82B9-55DCC6D2CCFD} = {FFE63A84-C897-45C6-964D-7F133EE83B3F}
-		{D40E3563-19F2-4FCC-9D2F-E689C14D74C2} = {FFE63A84-C897-45C6-964D-7F133EE83B3F}
-		{2BBB4332-1151-47DD-9DB7-711B660C7F09} = {FFE63A84-C897-45C6-964D-7F133EE83B3F}
-		{A3DDB169-C52E-43BD-A6A3-A2454B5B9F42} = {563F9405-6013-4868-9BE4-9EEEB0F08DFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {840CE627-64E7-4151-B48C-AAB3C870E574}
