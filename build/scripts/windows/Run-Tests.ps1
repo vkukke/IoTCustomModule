@@ -51,6 +51,7 @@ $LOGGER_ARG = "trx;LogFileName=result.trx"
 
 $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
 $CCTOOLS_PATH = Join-Path $AgentWorkFolder "cctools"
+$BINARIES_FOLDER = Join-Path $BuildBinariesDirectory "bin"
 $OPENCOVER = [IO.Path]::Combine($CCTOOLS_PATH, "OpenCover.4.6.519", "tools", "OpenCover.Console.exe")
 $CODE_COVERAGE = Join-Path $BuildBinariesDirectory "code-coverage.xml"
 $OPENCOVER_COBERTURA_CONVERTER = [IO.Path]::Combine(
@@ -99,7 +100,7 @@ foreach ($Project in (Get-ChildItem $BuildRepositoryLocalPath -Include $TEST_CSP
     }
     else {
 	    Write-Host "Running tests from else."
-        Invoke-Expression "&`"$DOTNET_PATH`" $BaseTestCommand -o $BuildBinariesDirectory $Project"
+        Invoke-Expression "&`"$DOTNET_PATH`" $BaseTestCommand -o $BINARIES_FOLDER $Project"
     }
 
     $Success = $Success -and $LASTEXITCODE -eq 0

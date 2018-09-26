@@ -68,7 +68,7 @@ $DOTNET_PATH = [IO.Path]::Combine($AgentWorkFolder, "dotnet", "dotnet.exe")
 $VERSIONINFO_FILE_PATH = Join-Path $BuildRepositoryLocalPath "versionInfo.json"
 $SRC_SCRIPTS_DIR = [IO.Path]::Combine($BuildRepositoryLocalPath, "build", "scripts")
 
-$BIN_FOLDER = Join-Path $BuildBinariesDirectory "bin"
+$BINARIES_FOLDER = Join-Path $BuildBinariesDirectory "bin"
 $PUBLISH_ROOT_FOLDER = Join-Path $BuildBinariesDirectory "publish"
 $PUBLISH_SCRIPTS_DIR = Join-Path $PUBLISH_ROOT_FOLDER "scripts"
 
@@ -108,7 +108,7 @@ Write-Host "`nBuilding all solutions in repo`n"
 
 foreach ($Solution in (Get-ChildItem $BuildRepositoryLocalPath -Include $SLN_PATTERN -Recurse)) {
     Write-Host "Building Solution - $Solution"
-    &$DOTNET_PATH build -c $Configuration -o $BIN_FOLDER $Solution |
+    &$DOTNET_PATH build -c $Configuration -o $BINARIES_FOLDER $Solution |
         Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Failed building $Solution."
