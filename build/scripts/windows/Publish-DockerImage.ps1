@@ -9,6 +9,9 @@ param (
     [Parameter(Mandatory = $true)]
     [String]$Project,
 
+	[Parameter(Mandatory = $true)]
+    [String]$ImageType,
+
     [ValidateNotNullOrEmpty()]
     [String]$Version = $Env:BUILD_BUILDID,
 
@@ -57,7 +60,7 @@ if ($SupportedArchs -notcontains $Architecture) {
 }
 
 $DockerDirectory = [IO.Path]::Combine($BuildBinariesDirectory, "publish", "customModule", "docker")
-$Dockerfile = [IO.Path]::Combine($DockerDirectory, "windows", $Architecture, "Dockerfile")
+$Dockerfile = [IO.Path]::Combine($DockerDirectory, $ImageType, $Architecture, "Dockerfile")
 if (-not (Test-Path $Dockerfile)) {
     throw "'$Dockerfile' is not the location."
 }
