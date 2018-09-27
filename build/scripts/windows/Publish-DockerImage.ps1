@@ -24,10 +24,6 @@ param (
     [ValidateNotNullOrEmpty()]
     [String]$BaseTag,
 
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript( {Test-Path $_ -PathType Container})]
-    [String]$BuildRepositoryLocalPath = $Env:BUILD_REPOSITORY_LOCALPATH,
-
 	[ValidateNotNullOrEmpty()]
     [ValidateScript( {Test-Path $_ -PathType Container})]
     [String]$BuildBinariesDirectory = $Env:BUILD_BINARIESDIRECTORY,
@@ -45,10 +41,6 @@ $ErrorActionPreference = "Stop"
 
 Import-Module ([IO.Path]::Combine($PSScriptRoot, "Defaults.psm1")) -Force
 
-if (-not $BuildRepositoryLocalPath) {
-    $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
-}
-
 if (-not $BuildBinariesDirectory) {
     $Params = @{}
     if ($Env:BUILD_REPOSITORY_LOCALPATH) {
@@ -64,8 +56,7 @@ if ($SupportedArchs -notcontains $Architecture) {
     throw "'$Architecture' is not a supported architecture."
 }
 
-$BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
-$DockerDirectory = [IO.Path]::Combine($BuildRepositoryLocalPath, "module", "customModule", "docker")
+$DockerDirectory = [IO.Path]::Combine($BuildBinariesDirectory, "publish", "customModule", "docker")
 $Dockerfile = [IO.Path]::Combine($DockerDirectory, "windows", $Architecture, "Dockerfile")
 if (-not (Test-Path $Dockerfile)) {
     throw "'$Dockerfile' is not the location."
@@ -95,11 +86,12 @@ $BuildOptions = "--no-cache -t $Tag --file $Dockerfile"
 if ($BaseTag) {
     $BuildOptions += " --build-arg base_tag=$BaseTag"
 }
+
 $BuildCommand = "docker build $BuildOptions $ProjectPublishDirectory"
-Write-Host "Running docker build."
+Write-Host "Running docker build $BuildCommand"
 Invoke-Expression $BuildCommand
 if ($LASTEXITCODE) {
-    throw "'$BuildCommand' failed with exit code $LASTEXITCODE."
+    throw "$BuildCommand failed with exit code $LASTEXITCODE."
 }
 
 <#

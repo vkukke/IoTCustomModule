@@ -127,12 +127,20 @@ $AppProjects = Get-ChildItem $BuildRepositoryLocalPath -Include $CSPROJ_PATTERN 
 
 foreach ($Project in $AppProjects) {
     Write-Host "Publishing Solution - $($Project.Filename)"
-    $ProjectPublishPath = Join-Path $PUBLISH_ROOT_FOLDER ($Project.Filename -replace @(".csproj", ""))
+	$ProjectFileNameTrimmed = ($Project.Filename -replace @(".csproj", ""))
+	$ProjectPathTrimmed = ($Project.Path -replace @(".csproj", ""))
+    $ProjectPublishPath = Join-Path $PUBLISH_ROOT_FOLDER $ProjectFileNameTrimmed
     &$DOTNET_PATH publish -f netcoreapp2.1 -c $Configuration -o $ProjectPublishPath $Project.Path |
         Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Failed publishing $($Project.Filename)."
     }
+	
+	$SrcDockerFolder = [IO.Path]::Combine($ProjectPathTrimmed, "..", "..", "docker")
+	$DestDockerFolder = Join-Path $ProjectPublishPath "docker"
+	
+	Write-Host "Copying docker files"
+	Copy-Item $SrcDockerFolder $DestDockerFolder -Recurse -Force 
 }
 
 <#
