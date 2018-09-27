@@ -69,7 +69,7 @@ if (-not $Version -or $Version -eq "") {
     throw "Docker image version not found. Please specify -Version when re-running this script."
 }
 
-$Tag = "${Name}:$Version-windows-$Architecture"
+$Tag = "${Name}:$Version-$ImageType-$Architecture"
 if ($Namespace) {
     $Tag = "$Namespace/$Tag"
 }
