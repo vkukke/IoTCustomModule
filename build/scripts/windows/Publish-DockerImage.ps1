@@ -26,6 +26,10 @@ param (
 
     [ValidateNotNullOrEmpty()]
     [ValidateScript( {Test-Path $_ -PathType Container})]
+    [String]$BuildRepositoryLocalPath = $Env:BUILD_REPOSITORY_LOCALPATH,
+
+	[ValidateNotNullOrEmpty()]
+    [ValidateScript( {Test-Path $_ -PathType Container})]
     [String]$BuildBinariesDirectory = $Env:BUILD_BINARIESDIRECTORY,
 
     [Switch]$Push,
@@ -41,6 +45,10 @@ $ErrorActionPreference = "Stop"
 
 Import-Module ([IO.Path]::Combine($PSScriptRoot, "Defaults.psm1")) -Force
 
+if (-not $BuildRepositoryLocalPath) {
+    $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
+}
+
 if (-not $BuildBinariesDirectory) {
     $Params = @{}
     if ($Env:BUILD_REPOSITORY_LOCALPATH) {
@@ -54,11 +62,6 @@ $SupportedArchs = @("amd64")
 $Architecture = $Architecture.ToLower()
 if ($SupportedArchs -notcontains $Architecture) {
     throw "'$Architecture' is not a supported architecture."
-}
-
-$ProjectDirectory = [IO.Path]::Combine($BuildBinariesDirectory, "publish", $Project)
-if (-not (Test-Path $ProjectDirectory -PathType "Container" )) {
-    throw "'$ProjectDirectory' is not a directory. Publish-Branch.ps1 must be run before building Docker images."
 }
 
 $BuildRepositoryLocalPath = DefaultBuildRepositoryLocalPath
@@ -80,15 +83,19 @@ if ($Registry) {
     $Tag = "$Registry/$Tag"
 }
 
+$ProjectPublishDirectory = [IO.Path]::Combine($BuildBinariesDirectory, "publish", $Project)
+if (-not (Test-Path $ProjectPublishDirectory -PathType "Container" )) {
+    throw "'$ProjectPublishDirectory' is not a directory. Build-Branch.ps1 must be run before building Docker images."
+}
+
 <#
  # Build the image
  #>
-
 $BuildOptions = "--no-cache -t $Tag --file $Dockerfile"
 if ($BaseTag) {
     $BuildOptions += " --build-arg base_tag=$BaseTag"
 }
-$BuildCommand = "docker build $BuildOptions $ProjectDirectory"
+$BuildCommand = "docker build $BuildOptions $ProjectPublishDirectory"
 Write-Host "Running docker build."
 Invoke-Expression $BuildCommand
 if ($LASTEXITCODE) {
