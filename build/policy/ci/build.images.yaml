@@ -40,12 +40,12 @@ phases:
         - task: Docker@1
           displayName: 'Build Docker Image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: $(azureServiceConnection)
+           azureSubscriptionEndpoint: 'ACR'
            imageName: $(imageName)
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: $(azureServiceConnection)
+           azureSubscriptionEndpoint: 'ACR'
            imageName: $(imageName)
            command: 'Push an image'
