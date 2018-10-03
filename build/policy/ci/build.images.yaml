@@ -10,7 +10,7 @@ phases:
        solution: '**/*.sln'
        buildPlatform: 'Any CPU'
        buildConfiguration: 'Release'
-       imageName: $(Build.Repository.Name):$(Build.BuildId)
+       imageName: $(Build.Repository.Name)-ci:0.0.$(Build.BuildId)
        
     steps:
         - task: NuGetToolInstaller@0
@@ -42,6 +42,7 @@ phases:
            azureSubscriptionEndpoint: 'ACR'
            azureContainerRegistry: 'vkeventgrid.azurecr.io'
            imageName: $(imageName)
+           dockerFile: 'Dockerfile.windows-amd64'
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
