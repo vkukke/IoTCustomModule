@@ -1,10 +1,10 @@
 phases:
 
 ################################################################################
-  - phase: windows
-    displayName: windows
+  - phase: linux
+    displayName: Build Linux Images (AMD64)
     queue:
-      name: Hosted VS2017
+      name: Hosted Ubuntu 1604
 
     variables:
        solution: '**/*.sln'
@@ -42,7 +42,7 @@ phases:
            azureSubscriptionEndpoint: 'ACR'
            azureContainerRegistry: 'vkeventgrid.azurecr.io'
            imageName: $(imageName)
-           dockerFile: '$(Build.SourcesDirectory)/build/docker/Dockerfile.windows-amd64'
+           dockerFile: '$(Build.SourcesDirectory)/build/docker/Dockerfile.linux-amd64'
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
