@@ -11,7 +11,7 @@ phases:
        buildPlatform: 'Any CPU'
        buildConfiguration: 'Release'
        imageName: $(Build.Repository.Name):$(Build.BuildId)
-       azureSubscription: $(user.azureSubscription)
+       azureSubscription: 'Azure Event Grid - Test (55f3dcd4-cac7-43b4-990b-a139d62a1eb2)'
   
     steps:
         - task: NuGetToolInstaller@0
