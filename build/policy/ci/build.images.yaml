@@ -42,7 +42,7 @@ phases:
            azureSubscriptionEndpoint: 'ACR'
            azureContainerRegistry: 'vkeventgrid.azurecr.io'
            imageName: $(imageName)
-           dockerFile: 'Dockerfile.windows-amd64'
+           dockerFile: '$(Build.SourcesDirectory)/build/policy/ci/Dockerfile.windows-amd64'
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
