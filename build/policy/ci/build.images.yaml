@@ -1,0 +1,51 @@
+phases:
+
+################################################################################
+  - phase: windows
+    displayName: windows
+    queue:
+      name: Hosted VS2017
+
+    variables:
+       solution: '**/*.sln'
+       buildPlatform: 'Any CPU'
+       buildConfiguration: 'Release'
+       imageName: $(Build.Repository.Name):$(Build.BuildId)
+       azureSubscription: $(user.azureSubscription)
+  
+    steps:
+        - task: NuGetToolInstaller@0
+          displayName: Install nuget tool
+
+        - task: DotNetCoreCLI@2
+          displayName: Restore
+          inputs:
+            command: restore
+            projects: |
+              **/*.csproj
+              !**/*tests/*.csproj
+            arguments: '--configuration $(buildConfiguration)'
+
+        - task: DotNetCoreCLI@2
+          displayName: Build and publish
+          inputs:
+            command: publish
+            projects: |
+              **/*.csproj
+              !**/*tests/*.csproj
+            arguments: '--configuration $(buildConfiguration) --no-restore --output $(Build.ArtifactStagingDirectory)'
+            publishWebProjects: false
+            zipAfterPublish: false
+
+         - task: Docker@1
+           displayName: 'Build Docker Image (ACR)'
+           inputs:
+           azureSubscriptionEndpoint: $(azureSubscriptionId)
+           imageName: $(imageName)
+
+         - task: Docker@1
+           displayName: 'Push an image (ACR)'
+           inputs:
+           azureSubscriptionEndpoint: $(azureSubscriptionId)
+           imageName: $(imageName)
+           command: 'Push an image'
