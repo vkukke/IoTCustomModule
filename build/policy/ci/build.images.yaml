@@ -11,7 +11,7 @@ phases:
        buildPlatform: 'Any CPU'
        buildConfiguration: 'Release'
        imageName: $(Build.Repository.Name):$(Build.BuildId)
-       azureSubscription: 'Azure Event Grid - Test (55f3dcd4-cac7-43b4-990b-a139d62a1eb2)'
+       azureServiceConnection: 'ACR'
   
     steps:
         - task: NuGetToolInstaller@0
@@ -40,12 +40,12 @@ phases:
         - task: Docker@1
           displayName: 'Build Docker Image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: $(azureSubscriptionId)
+           azureSubscriptionEndpoint: $(azureServiceConnection)
            imageName: $(imageName)
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: $(azureSubscriptionId)
+           azureSubscriptionEndpoint: $(azureServiceConnection)
            imageName: $(imageName)
            command: 'Push an image'
