@@ -38,14 +38,14 @@ phases:
             zipAfterPublish: false
 
         - task: Docker@1
-           displayName: 'Build Docker Image (ACR)'
-           inputs:
+          displayName: 'Build Docker Image (ACR)'
+          inputs:
            azureSubscriptionEndpoint: $(azureSubscriptionId)
            imageName: $(imageName)
 
         - task: Docker@1
-           displayName: 'Push an image (ACR)'
-           inputs:
+          displayName: 'Push an image (ACR)'
+          inputs:
            azureSubscriptionEndpoint: $(azureSubscriptionId)
            imageName: $(imageName)
            command: 'Push an image'
