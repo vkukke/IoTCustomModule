@@ -39,13 +39,14 @@ phases:
         - task: Docker@1
           displayName: 'Build Docker Image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: 'ACR2'
+           azureSubscriptionEndpoint: 'Azure Event Grid - Test (55f3dcd4-cac7-43b4-990b-a139d62a1eb2)'
            azureContainerRegistry: 'vkeventgrid.azurecr.io'
            imageName: $(imageName)
 
         - task: Docker@1
           displayName: 'Push an image (ACR)'
           inputs:
-           azureSubscriptionEndpoint: 'ACR2'
+           azureSubscriptionEndpoint: 'Azure Event Grid - Test (55f3dcd4-cac7-43b4-990b-a139d62a1eb2)'
+           azureContainerRegistry: 'vkeventgrid.azurecr.io'
            imageName: $(imageName)
            command: 'Push an image'
